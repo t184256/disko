@@ -1,4 +1,4 @@
-{ stdenvNoCC, makeWrapper, lib, path }:
+{ stdenvNoCC, makeWrapper, lib, path, coreutils, nix }:
 
 stdenvNoCC.mkDerivation rec {
   name = "disko";
@@ -14,7 +14,10 @@ stdenvNoCC.mkDerivation rec {
       -e "s|#!/usr/bin/env.*|#!/usr/bin/env bash|" \
       disko > $out/bin/disko
     chmod 755 $out/bin/disko
-    wrapProgram $out/bin/disko --prefix NIX_PATH : "nixpkgs=${path}"
+    wrapProgram $out/bin/disko \
+      --prefix PATH : "${coreutils}/bin" \
+      --prefix PATH : "${nix}/bin" \
+      --prefix NIX_PATH : "nixpkgs=${path}"
   '';
   meta = with lib; {
     description = "Format disks with nix-config";
